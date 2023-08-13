@@ -1,0 +1,73 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: serverless-go-inquiry-form
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: go1.x
+  region: ap-northeast-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "sns:Publish"
+          Resource:
+            - !Ref InquirySNSTopic
+  httpApi:
+    cors:
+      allowedOrigins:
+        - http://localhost:3000
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+      allowedMethods:
+        - POST
+      allowCredentials: true
+
+package:
+  patterns:
+    - "!./**"
+    - ./bin/**
+
+functions:
+  inquiry:
+    handler: bin/inquiry
+    events:
+      - httpApi:
+          path: /inquiry
+          method: post
+    environment:
+      SNS_TOPIC_ARN: !Ref InquirySNSTopic
+
+resources:
+  Resources:
+    InquirySNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: "istoneyou.netでのお問い合わせ"
+        TopicName: "InquirySNSTopic"
+    InquirySNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: istoneyou1205@gmail.com
+        Protocol: email
+        TopicArn: !Ref InquirySNSTopic
