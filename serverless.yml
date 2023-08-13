@@ -35,7 +35,7 @@ provider:
   httpApi:
     cors:
       allowedOrigins:
-        - https://istoneyou.net/
+        - https://istoneyou.net
       allowedHeaders:
         - Content-Type
         - Authorization
